@@ -1,0 +1,92 @@
+<head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>MapImageLayer - raster data source - 4.11</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/MapImageLayer",
+      ], function(Map, MapView, MapImageLayer) {
+        var layer = new MapImageLayer({
+          url:
+            "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer",
+          minScale: 2000000,
+          sublayers: [
+            {
+            renderer: {
+            type: "simple", // autocasts as new SimpleRenderer()
+            symbol: {
+              type: "simple-line",  // autocasts as new SimpleLineSymbol()
+              color: "red",
+               width: "5px",
+              style: "short-dot"
+             }
+            }
+             ,
+              source: {
+                type: "data-layer",
+                dataSource: {
+                  type: "table",
+                  workspaceId: "shp_zzb",
+                  dataSourceName: "sz_jhx.shp"
+                }
+              }
+
+            }
+            
+          ]
+        });
+     
+        var map = new Map({
+          basemap: "streets-relief-vector",
+          layers: [layer]
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [114.063717,22.550304],
+          zoom: 9
+        });
+
+   
+      });
+    </script>
+
+    <style>
+      html,
+      body {
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      #viewDiv {
+        position: absolute;
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: 100px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>three</title>
+    <style>
+        html, body{
+            height:100%;
+        }
+        body{
+            margin: 0px;
+        }
+        .container {
+            height:90%;
+        }
+        .container:after{
+            clear:both;
+        }
+    
+        #leftDiv{
+            width:32%;
+            height:100%;
+            float:left;
+
+            border: 3px solid #333333;
+            margin-left:10px;
+        }
+        #rightDiv{
+            width:32%;
+            float:right;
+            height:100%;
+            border: 3px solid #333333;
+            margin-right:10px;
+        }
+        #middleDiv{
+            width:32%;
+            height:100%;
+            border: 3px solid #333333;
+            margin-left:33.8%;
+            margin-right: 33.3%;
+        }
+    </style>
+    <link
+    rel="stylesheet"
+    href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+  />
+  <script src="https://js.arcgis.com/4.11/"></script>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/SceneView",
+      "esri/views/MapView",
+      "esri/geometry/Point",
+      "esri/core/watchUtils",
+      "esri/layers/FeatureLayer"
+    ], function(Map, MapView, MapView, Point, watchUtils,FeatureLayer) {
+        //创建图层
+        var layer1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          
+          });
+        var layer2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	  
+          });
+
+          var layer3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+      var mainMap = new Map({
+        basemap: "streets-relief-vector",
+        layers: [layer1]
+      });
+      var middleMap = new Map({
+        basemap: "streets-relief-vector",
+        layers: [layer2]   
+      });
+      var overviewMap = new Map({
+        basemap: "streets-relief-vector",
+        layers: [layer3]  
+      });
+
+      var mainView = new MapView({
+        container: "rightDiv",
+        map: mainMap,
+        center:[114.063717,22.550304],
+        zoom: 9, 
+      });
+      
+      var middleView = new MapView({
+        container: "middleDiv",
+        map: middleMap,
+        center:[109.063717,31.550304],
+        zoom: 9,
+      });
+
+  
+      var mapView = new MapView({
+        container: "leftDiv",
+        map: overviewMap,
+        center:[119.063717,31.550304],
+        zoom: 9,
+      });
+      // Remove the default widgets
+      mapView.ui.components = [];
+      middleView.ui.components = [];
+      mainView.ui.components = [];
+      mapView.on('drag', function(event) {
+        synchronous(mainView,mapView);
+        synchronous(middleView,mapView);
+    });
+    mapView.on("mouse-wheel", function(evt){
+      synchronous2(mainView,mapView);
+      synchronous2(middleView,mapView);
+     });       
+    mainView.on('drag', function(event) {
+        synchronous(mapView,mainView);
+        synchronous(middleView,mainView);
+    }); 
+    mainView.on('mouse-wheel', function(event) {
+        synchronous2(mapView,mainView);
+        synchronous2(middleView,mainView);
+    }); 
+    middleView.on('drag', function(event) {
+        synchronous(mapView,middleView);
+        synchronous(mainView,middleView);
+    }); 
+    middleView.on('mouse-wheel', function(event) {
+        synchronous2(mapView,middleView);
+        synchronous2(mainView,middleView);
+    }); 
+      //封装好的负责连动的方法  
+    function synchronous(map,main){   
+          map.
+          when(function(){
+            watchUtils.whenTrueOnce(main,"stationary", function(){ 
+              map.goTo({
+                 center: main.center
+              })
+        });  
+     });        
+    }
+
+    function synchronous2(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrue(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center,
+                 scale:
+                main.scale *
+                0.8*
+                Math.max(
+                  main.width / map.width,
+                  main.height / map.height
+                )
+              })
+         });  
+      });        
+     }
+  });
+  </script>
+</head>
+<body>
+    <div class="container">
+        <div id="leftDiv"></div>
+        <div id="rightDiv"></div>
+        <div id="middleDiv"></div>
+    </div>
+</body>
+</html>

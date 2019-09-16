@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="UTF-8">
+    <title>Two</title>
+    <style>
+        html, body{
+            height:100%;
+        }
+        body{
+            margin: 0px;
+        }
+        .container {
+            height:90%;
+        }
+        .container:after{
+            clear:both;
+        }
+
+        #leftDiv{
+            width:48%;
+            height:100%;
+            float:left;
+            border: 3px solid #333333;
+            margin:0 10px;
+        }
+        #rightDiv{
+            width:48%;
+            float:right;
+            height:100%;
+            border: 3px solid #333333;
+            margin:0 10px;
+        }
+    </style>
+     <link
+     rel="stylesheet"
+     href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+   />
+   <script src="https://js.arcgis.com/4.11/"></script>
+
+   <script>
+     require([
+       "esri/Map",
+       "esri/views/SceneView",
+       "esri/views/MapView",
+       "esri/geometry/Point",
+       "esri/core/watchUtils",
+       "esri/layers/FeatureLayer"
+     ], function(Map, MapView, MapView, Point, watchUtils,FeatureLayer) {
+
+      var layer1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          
+          });
+           var layer2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	  
+          });
+       var mainMap = new Map({
+         basemap: "streets-relief-vector",
+         layers: [layer1]
+       });
+       var overviewMap = new Map({
+         basemap: "streets-relief-vector",
+         layers: [layer2]   
+       });
+       var mainView = new MapView({
+         container: "rightDiv",
+         map: mainMap,
+         center: [114.063717,22.550304],
+         zoom: 9,
+         
+       });
+   
+       // Create the MapView for overview map
+       var mapView = new MapView({
+         container: "leftDiv",
+         map: overviewMap,
+         center:[119.063717,31.550304],
+         zoom: 9,
+       });
+       // Remove the default widgets
+       mapView.ui.components = [];
+      //  mainView.ui.components = [];
+       mapView.on('drag', function(event) {
+         synchronous(mainView,mapView);
+     });
+    
+    //  mapView.on("double-click", function(evt){
+    //   synchronous2(mainView,mapView);
+    //  });   
+      mainView.on('drag', function(event) {
+         synchronous(mapView,mainView);
+     }); 
+     mainView.on("double-click", function(evt){
+      synchronous2(mapView,mainView);
+     }); 
+       //封装好的负责连动的方法  
+     function synchronous(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrueOnce(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center
+              })
+         });  
+      });        
+     }
+
+     function synchronous2(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrue(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center,
+                 scale:
+                main.scale *
+                0.8*
+                Math.max(
+                  main.width / map.width,
+                  main.height / map.height
+                )
+              })
+         });  
+      });        
+     }
+   });
+   </script>
+</head>
+<body>
+<div class="container">
+    <div id="leftDiv"></div>
+    <div id="rightDiv"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>MapImageLayer - dynamic data layer with table join - 4.11</title>
+    <link
+            rel="stylesheet"
+            href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/">
+    </script>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/MapImageLayer",
+            "esri/widgets/Legend",
+            "esri/tasks/QueryTask",
+            "esri/tasks/support/Query",
+            "esri/Graphic",
+            "esri/widgets/Search",
+            "esri/layers/FeatureLayer",
+
+
+            //"esri/Graphic",
+        ], function (Map, MapView, MapImageLayer, Legend, QueryTask, Query, Graphic, Search, FeatureLayer) {
+            function createSymbol(color) {
+                return {
+                    type: "simple-fill", // autocasts as new SimpleFillSymbol()
+                    color: color,
+                    outline: {
+                        width: 0.5,
+                        color: [255, 255, 255, 0.4]
+                    },
+                    style: "solid"
+                };
+            }
+
+
+            var layer = new MapImageLayer({
+                url:
+                    "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer",
+                title: "United States Population",
+                sublayers: [
+                    {
+                        title: "Share of population with Norwegian Ancestry",
+                        id: 1,
+                        opacity: 0.75,
+                        source: {
+                            type: "data-layer",
+                            dataSource: {
+                                type: "join-table",
+                                leftTableSource: {
+                                    type: "map-layer",
+                                    mapLayerId: 1
+                                },
+                                rightTableSource: {
+                                    type: "data-layer",
+                                    dataSource: {
+                                        type: "table",
+                                        workspaceId: "sde",
+                                        dataSourceName: "SDE.TBL_SZ_cx"
+                                    }
+                                },
+                                leftTableKey: "NO",
+                                rightTableKey: "no",
+
+                                joinType: "left-outer-join"
+                            },
+                        }, popupTemplate: {
+                            title: "{SDE.TBL_SZ_cx.NO}",
+                            content: [
+                                {
+                                    type: "fields",
+                                    fieldInfos: [
+                                        {
+                                            fieldName: "SDE.TBL_SZ_cx.NO",
+                                            label: "NO",
+                                            visible: true,
+                                            isEditable: true,
+                                            tooltip: "",
+                                            format: {
+                                                digitSeparator: true,
+                                                places: 0
+                                            }
+
+                                        },
+                                        {
+                                            fieldName: "SDE.TBL_SZ_cx.NUM",
+                                            label: "NUM",
+                                            visible: true,
+                                            isEditable: true,
+                                            tooltip: "",
+                                            format: {
+                                                digitSeparator: true,
+                                                places: 0
+                                            }
+
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            });
+
+
+            var renderer = {
+                type: "class-breaks", // autocasts as new ClassBreaksRenderer()
+                field: "SDE.TBL_SZ_cx.NUM",
+                classBreakInfos: [
+                    {
+                        minValue: 0,
+                        maxValue: 0,
+                        symbol: createSymbol("blue"),
+                        label: "0 - 100"
+                    },
+                    {
+                        minValue: 100,
+                        maxValue: 300,
+                        symbol: createSymbol("red"),
+                        label: "0 - 300"
+                    },
+                    {
+                        minValue: 300,
+                        maxValue: 10000,
+                        symbol: createSymbol("green"),
+                        label: "300 - 100000"
+                    }
+                ]
+            };
+            renderer.classBreakInfos[0].minValue = 10;
+            renderer.classBreakInfos[0].maxValue = 1000;
+            renderer.classBreakInfos[0].label = renderer.classBreakInfos[0].minValue + "~" + renderer.classBreakInfos[0].maxValue;
+            console.log(renderer.classBreakInfos[0].minValue);
+            var norwegianSublayer = layer.sublayers.find(function (sublayer) {
+                return (
+                    sublayer.title === "Share of population with Norwegian Ancestry"
+                );
+            });
+            norwegianSublayer.renderer = renderer;
+
+            var map = new Map({
+                basemap: "streets",
+                layers: [layer]
+            });
+
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [114.063717, 22.550304],
+                zoom: 9
+            });
+            //高亮
+            view.on("click", function (e) {
+                var queryTask = new QueryTask({
+                    url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",
+                });
+
+                var query = new Query();
+                // query.orderByFields  = ["Name"];
+                query.returnGeometry = true;
+                query.geometry = e.mapPoint;
+                query.outFields = ["ID"];
+
+                queryTask.execute(query)
+                    .then(function (result) {
+                        console.log(result)
+
+                        //    var featureLayer = new FeatureLayer({
+                        //   url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
+                        // });
+                        // var graphic=new Graphic(result.)
+
+
+                        var polyGraphic = new Graphic({
+                            geometry: result.features[0].geometry,
+                            attributes: result.features[0].attributes
+                        });
+                        polyGraphic.symbol = {
+                            type: "simple-fill",
+                            color: [0, 255, 255, 0.5],
+                            outline: {
+                                color: [0, 255, 255],
+                                width: "2px"
+                            }
+                        }
+                        view.graphics.removeAll();
+                        view.graphics.add(polyGraphic);
+
+                    })
+                    .otherwise(function (e) {
+                        console.log(e);
+                    });
+            });
+
+
+            view.when(function () {
+                var legend = new Legend({
+                    view: view
+                });
+                view.ui.add(legend, "bottom-left");
+                var search = new Search({
+                    view: view
+                });
+                view.ui.add(search, "top-right");
+            });
+
+
+        });
+
+
+    </script>
+</head>
+<body>
+<div id="optionsDiv">
+    <button id="default">Default flight</button>
+    <button id="linearSlow">Linear slow flight</button>
+    <button id="linearFast">Linear fast flight</button>
+    <button id="expoIncrease">Exponentially increasing speed flight</button>
+    <button id="fixedDuration">10 seconds flight</button>
+    <button id="bounceBerlin">Bounce to Berlin</button>
+</div>
+<div id="viewDiv"></div>
+</body>
+</html>

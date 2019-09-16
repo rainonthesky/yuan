@@ -1,0 +1,112 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Overview map - 4.11</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            right: 12px;
+            bottom: 12px;
+            left: 12px;
+            padding: 0;
+            margin: 0;
+            border: 1px solid black;
+            width: 940px;
+            height: 800px;
+            z-index: -1;
+        }
+
+        #overviewDiv {
+            position: absolute;
+            top: 1px;
+            right: 12px;
+            width: 940px;
+            height: 800px;
+            border: 1px solid rgb(235, 31, 31);
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        #extentDiv {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            z-index: 2;
+        }
+    </style>
+
+    <link
+            rel="stylesheet"
+            href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/"></script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/SceneView",
+            "esri/views/MapView",
+            "esri/geometry/Point",
+            "esri/core/watchUtils"
+        ], function (Map, MapView, MapView, Point, watchUtils) {
+            var mainMap = new Map({
+                basemap: "streets-relief-vector",
+            });
+            var overviewMap = new Map({
+                basemap: "streets-relief-vector"
+            });
+
+
+            var mainView = new MapView({
+                container: "viewDiv",
+                map: mainMap,
+                center: [114.063717, 22.550304],
+                zoom: 9,
+
+            });
+
+            // Create the MapView for overview map
+            var mapView = new MapView({
+                container: "overviewDiv",
+                map: overviewMap,
+                center: [119.063717, 31.550304],
+                zoom: 9,
+            });
+            // Remove the default widgets
+            mapView.ui.components = [];
+            mainView.ui.components = [];
+            var extentDiv = document.getElementById("extentDiv");
+            mapView.on("click", function (event) {
+                viewMessage(mainView, mapView);
+            });
+            mainView.on("click", function (event) {
+                viewMessage(mapView, mainView)
+            });
+
+            //封装好的负责连动的方法
+            function viewMessage(map, main) {
+                map.when(function () {
+                    watchUtils.whenTrue(main, "stationary", function () {
+                        if (map.extent) {
+                            map.goTo({
+                                center: main.center,
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+<div id="viewDiv"></div>
+<div id="overviewDiv">
+    <div id="extentDiv"></div>
+</div>
+</body>
+</html>

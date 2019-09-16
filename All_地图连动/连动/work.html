@@ -1,0 +1,128 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Overview map - 4.11</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            width: 940px;
+            height: 800px;
+            z-index: -1;
+        }
+
+        #overviewDiv {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 300px;
+            height: 200px;
+            border: 1px solid black;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        #extentDiv {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            z-index: 2;
+        }
+    </style>
+
+    <link
+            rel="stylesheet"
+            href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/"></script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/SceneView",
+            "esri/views/MapView",
+            "esri/geometry/Point",
+            "esri/core/watchUtils"
+        ], function (Map, MapView, MapView, Point, watchUtils) {
+            var mainMap = new Map({
+                basemap: "streets-relief-vector",
+            });
+
+
+            var overviewMap = new Map({
+                basemap: "streets-relief-vector"
+
+            });
+
+
+            var mainView = new MapView({
+                container: "viewDiv",
+                map: mainMap,
+                center: [114.063717, 22.550304],
+                zoom: 9,
+
+            });
+
+
+            // Create the MapView for overview map
+            var mapView = new MapView({
+                container: "overviewDiv",
+                map: overviewMap,
+                zoom: 9,
+            });
+
+            // Remove the default widgets
+            //  mapView.ui.components = [];
+
+            var extentDiv = document.getElementById("extentDiv");
+            mapView.when(function () {
+                mainView.watch("extent", updateOverviewExtent);
+                mapView.watch("extent", updateOverviewExtent);
+                watchUtils.when(mainView, "stationary", updateOverview);
+
+                function updateOverview() {
+                    mapView.goTo({
+                        center: mainView.center,
+                    });
+                }
+
+                function updateOverviewExtent() {
+                    var extent = mainView.extent;
+                    var bottomLeft = mapView.toScreen(
+                        new Point({
+                            x: extent.xmin,
+                            y: extent.ymin,
+                            spatialReference: extent.spatialReference
+                        })
+                    );
+
+                    var topRight = mapView.toScreen(
+                        new Point({
+                            x: extent.xmax,
+                            y: extent.ymax,
+                            spatialReference: extent.spatialReference
+                        })
+                    );
+                    extentDiv.style.top = topRight.y + "px";
+                    extentDiv.style.left = bottomLeft.x + "px";
+
+                    extentDiv.style.height = bottomLeft.y - topRight.y + "px";
+                    extentDiv.style.width = topRight.x - bottomLeft.x + "px";
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+<div id="viewDiv"></div>
+<div id="overviewDiv">
+    <div id="extentDiv"></div>
+</div>
+</body>
+</html>

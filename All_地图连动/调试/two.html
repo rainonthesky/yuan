@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="UTF-8">
+    <title>Two</title>
+    <style>
+        html, body{
+            height:100%;
+        }
+        body{
+            margin: 0px;
+        }
+        .container {
+            height:90%;
+        }
+        .container:after{
+            clear:both;
+        }
+
+        #leftDiv{
+            width:48%;
+            height:100%;
+            float:left;
+            border: 3px solid #333333;
+            margin:0 10px;
+        }
+        #rightDiv{
+            width:48%;
+            float:right;
+            height:100%;
+            border: 3px solid #333333;
+            margin:0 10px;
+        }
+        .navFilter{
+            margin:10px 0;
+            padding-left:10px;
+            width: 100%;
+        }
+        .navFilter select{
+            border-radius: 3px;
+            width:200px;
+            height:30px;
+        }
+        .right_select{
+            margin-left:40%;
+        }
+    </style>
+     <link
+     rel="stylesheet"
+     href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+   />
+   <script src="https://js.arcgis.com/4.11/"></script>
+
+   <script>
+     require([
+       "esri/Map",
+       "esri/views/SceneView",
+       "esri/views/MapView",
+       "esri/geometry/Point",
+       "esri/core/watchUtils",
+       "esri/layers/FeatureLayer",
+       "esri/layers/TileLayer"
+     ], function(Map, MapView, MapView, Point, watchUtils,FeatureLayer,TileLayer) {
+      //Left边地图的图层
+      var layerLeft0= new FeatureLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/Street0510/MapServer/0",
+          });
+      var layerLeft1= new FeatureLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/Street0510/MapServer/0",	
+          });
+      var layerLeft2= new TileLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/00jichuditu/MapServer",
+          
+          });
+      var layerLeft3= new TileLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/00jichuditu/MapServer",
+ 
+       	  
+          });
+       //Right边地图的图层
+      var layerRight0= new FeatureLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/Street0510/MapServer/0",	
+          });
+      var layerRight1= new FeatureLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/Street0510/MapServer/0",	
+          });
+
+      var layerRight2= new TileLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/00jichuditu/MapServer",	
+          });
+     var layerRight3= new TileLayer({
+         	url: "http://192.168.80.142:6080/arcgis/rest/services/CZ/00jichuditu/MapServer",    
+          });
+      //Left边地图获取元素并添加图层，option的value值按规则进行填写
+      var selecteLeft = document.getElementById("left_select");
+      selecteLeft.addEventListener("change",function(){
+      var selecteLeftVal = document.getElementById("left_select").value;
+      //i的值按option的value值得多少个进行设定
+        for(var i=0;i<20;i++){
+         if(selecteLeftVal==="layerLeft"+i){
+            overviewMap.layers.removeAll();
+            overviewMap.layers.add(eval("(" + selecteLeftVal + ")"));
+          }
+       }
+      });
+      //同上所述
+      var selecteRight = document.getElementById("right_select");
+       selecteRight.addEventListener("change",function(){
+        var selectedRightVal = document.getElementById("right_select").value;
+        for(var i=0;i<20;i++){
+         if(selectedRightVal==="layerRight"+i){
+            mainMap.layers.removeAll();
+            mainMap.layers.add(eval("(" + selectedRightVal + ")"));
+          }
+        }
+      });
+  
+        
+       var mainMap = new Map({
+        //  basemap: "osm",
+         layers: [layerRight3]
+       });
+       mainMap.add(layerLeft0)
+      
+       var overviewMap = new Map({
+         basemap: "streets-relief-vector",
+         layers: [layerRight0]   
+       });
+    
+       var mainView = new MapView({
+         container: "rightDiv",
+         map: mainMap,
+         center: [29.95,31.78],
+         zoom: 4,
+       });
+       // Create the MapView for overview map
+       var mapView = new MapView({
+         container: "leftDiv",
+         map: overviewMap,
+         center:[29.95,31.78],
+         zoom: 4,
+         });
+         console.log(mainView.center.x);
+         console.log(mainView.center.y);
+
+         var pt = new Point({
+             x: 494175.76220658893,
+             y: 3509668.600026387
+            });
+       mainView.center = pt;
+       console.log(mainView)
+
+      mainView.on('drag', function(event) {
+         synchronous(mapView,mainView);
+         console.log(mainView.center.x);
+         console.log(mainView.center.y);
+         }); 
+      //阻止滚动事件
+      mapView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });
+      mainView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });   
+     
+     //监听放大缩小按钮
+     window.onload = function(){
+      var listen1 = document.getElementById('leftDiv').querySelectorAll('.esri-widget--button');
+      listen1[0].addEventListener('click',function(){
+        synchronous2(mainView,mapView);
+      })
+      listen1[1].addEventListener('click',function(){
+        synchronous2(mainView,mapView);
+      })
+      var listen2 = document.getElementById('rightDiv').querySelectorAll('.esri-widget--button');
+      listen2[0].addEventListener('click',function(){
+        synchronous2(mapView,mainView);
+      })
+      listen2[1].addEventListener('click',function(){
+        synchronous2(mapView,mainView);
+      })
+     }
+       //封装好的负责连动的方法  
+     function synchronous(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrueOnce(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center
+              })
+         });  
+      });        
+     }
+
+     function synchronous2(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrueOnce(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center,
+                 scale:
+                main.scale *
+                0.8*
+                Math.max(
+                  main.width / map.width,
+                  main.height / map.height
+                )
+              })
+         });  
+      });        
+     }
+   });
+   </script>
+</head>
+<body>
+<div class ="navFilter">
+    <select id = "left_select" class="left_select">
+        <option value = "layerLeft0">田坎</option>
+        <option value = "layerLeft1">铁路用地</option>
+    </select>
+    <button  style="margin:20px 200px;"><a href="three.html">切换页面</a></button>
+    <select id = "right_select" class="right_select">
+        <option value = "layerRight0">田坎</option>
+        <option value = "layerRight1">铁路用地</option>
+
+    </select>
+    
+</div>
+<div class="container">
+    <div id="leftDiv"></div>
+    <div id="rightDiv"></div>
+</div>
+</body>
+</html>

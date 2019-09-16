@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Four</title>
+    <style>
+        html, body{
+        height:100%;
+        }
+        body{
+        margin: 0px;
+        }
+        .container {
+        height:90%;
+        }
+        .container:after,.row:after{
+        clear:both;
+        }
+
+        #leftDiv{
+            width:32%;
+            height:100%;
+            float:left;
+            border: 3px solid #333333;
+            margin-left:10px;
+        }
+        #rightDiv{
+            width:32%;
+            float:right;
+            height:100%;
+            border: 3px solid #333333;
+            margin-right:10px;
+        }
+        #middleDiv{
+            width:32%;
+            height:100%;
+            border: 3px solid #333333;
+            margin-left:33.8%;
+            margin-right: 33.3%;
+        }
+
+        #bottomLeftDiv{
+        width:48%;
+        height:100%;
+        float:left;
+        border: 3px solid #333333;
+        margin-left:10px;
+        }
+        #bottomLeftDiv{
+            width:32%;
+            height:100%;
+            float:left;
+            border: 3px solid #333333;
+            margin-left:10px;
+        }
+        #bottomRightDiv{
+            width:32%;
+            float:right;
+            height:100%;
+            border: 3px solid #333333;
+            margin-right:10px;
+        }
+        #bottomMiddleDiv{
+            width:32%;
+            height:100%;
+            border: 3px solid #333333;
+            margin-left:33.8%;
+            margin-right: 33.3%;
+        }
+        .row{
+            width: 100%;
+            height: 48%;
+            margin-bottom:20px;
+        }
+        .navFilter select{
+            width:200px;
+            height:30px;
+            border-radius: 3px;
+        }
+        .navFilter{
+            margin:10px 0;
+            padding-left:10px;
+            width: 100%;
+        }
+        .right_select{
+            margin-left:22.5%;
+        }
+        .middle_select{
+            margin-left:22.8%;
+        }
+    </style>
+  <link
+  rel="stylesheet"
+  href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+/>
+<script src="https://js.arcgis.com/4.11/"></script>
+
+<script>
+  require([
+    "esri/Map",
+    "esri/views/SceneView",
+    "esri/views/MapView",
+    "esri/geometry/Point",
+    "esri/core/watchUtils",
+    "esri/layers/FeatureLayer"
+  ], function(Map, MapView, MapView, Point, watchUtils,FeatureLayer) {
+
+          //Left边地图的图层
+      var layerLeft0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",
+          });
+      var layerLeft1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerLeft2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+      var layerLeft3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+       //Right边地图的图层
+      var layerRight0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          });
+      var layerRight1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerRight2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+     var layerRight3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+          //Middle地图的图层
+      var layerMiddle0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          });
+      var layerMiddle1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerMiddle2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+     var layerMiddle3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+
+                //Left边地图的图层
+      var layerBL0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",
+          });
+      var layerBL1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerBL2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+      var layerBL3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+       //Right边地图的图层
+      var layerBR0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          });
+      var layerBR1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerBR2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+     var layerBR3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+          //Middle地图的图层
+      var layerBM0= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/0",	
+          });
+      var layerBM1= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/1",	
+          });
+      var layerBM2= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/2",	  
+          });
+    var layerBM3= new FeatureLayer({
+         	url: "http://192.168.31.105:6080/arcgis/rest/services/xsz/sz_zzb/MapServer/3",	  
+          });
+    var mainMap = new Map({
+        basemap: "streets-relief-vector",
+        layers: [layerLeft0]   
+      });
+    var overViewMap = new Map({
+        basemap: "streets-relief-vector",
+        layers: [layerRight0]  
+      });
+    var middleViewMap = new Map({
+      basemap: "streets-relief-vector",
+      layers: [layerMiddle0]   
+    });
+    var fourViewMap = new Map({
+      basemap: "streets-relief-vector",
+      layers: [layerBL0]   
+    });
+    var fiveViewMap = new Map({
+      basemap: "streets-relief-vector",
+      layers: [layerBR0]   
+    });
+    var sixViewMap = new Map({
+      basemap: "streets-relief-vector",
+      layers: [layerBM0]   
+    });
+    //Left边地图获取元素并添加图层，option的value值按规则进行填写
+      var selecteLeft = document.getElementById("left_select_1");
+      selecteLeft.addEventListener("change",function(){
+      var selecteLeftVal = document.getElementById("left_select_1").value;
+    //i的值按option的value值得多少个进行设定
+        for(var i=0;i<20;i++){
+         if(selecteLeftVal==="layerLeft"+i){
+          overViewMap.layers.removeAll();
+          overViewMap.layers.add(eval("(" + selecteLeftVal + ")"));
+          }
+       }
+      });
+      //同上所述
+      var selecteRight = document.getElementById("right_select_1");
+       selecteRight.addEventListener("change",function(){
+        var selectedRightVal = document.getElementById("right_select_1").value;
+        for(var i=0;i<20;i++){
+         if(selectedRightVal==="layerRight"+i){
+          mainMap.layers.removeAll();
+          mainMap.layers.add(eval("(" + selectedRightVal + ")"));
+          }
+        }
+      });
+        //同上所述
+      var selecteMiddle = document.getElementById("middle_select_1");
+        selecteMiddle.addEventListener("change",function(){
+        var selecteMiddleVal = document.getElementById("middle_select_1").value;
+        for(var i=0;i<20;i++){
+         if(selecteMiddleVal==="layerMiddle"+i){
+          middleViewMap.layers.removeAll();
+          middleViewMap.layers.add(eval("(" + selecteMiddleVal + ")"));
+          }
+        }
+      });
+      
+
+
+
+
+    var selecteBL = document.getElementById("left_select_2");
+      selecteBL.addEventListener("change",function(){
+      var selecteBLVal = document.getElementById("left_select_2").value;
+    //i的值按option的value值得多少个进行设定
+        for(var i=0;i<20;i++){
+         if(selecteBLVal==="layerBL"+i){
+          fourViewMap.layers.removeAll();
+          fourViewMap.layers.add(eval("(" + selecteBLVal + ")"));
+          }
+       }
+      });
+      //同上所述
+      var selecteBR = document.getElementById("right_select_2");
+        selecteBR.addEventListener("change",function(){
+        var selecteBRVal = document.getElementById("right_select_2").value;
+        for(var i=0;i<20;i++){
+         if(selecteBRVal==="layerBR"+i){
+          fiveViewMap.layers.removeAll();
+          fiveViewMap.layers.add(eval("(" + selecteBRVal + ")"));
+          }
+        }
+      });
+        //同上所述
+        var selecteBM= document.getElementById("middle_select_2");
+        selecteBM.addEventListener("change",function(){
+        var selecteBMVal = document.getElementById("middle_select_2").value;
+        for(var i=0;i<20;i++){
+         if(selecteBMVal==="layerBM"+i){
+          sixViewMap.layers.removeAll();
+          sixViewMap.layers.add(eval("(" + selecteBMVal + ")"));
+          }
+        }
+      });
+
+    var mainView = new MapView({
+      container: "rightDiv",
+      map: mainMap,
+      center:[114.063717,22.550304],
+      zoom: 9,
+    });
+    // Create the MapView for overview map   
+    var mapView = new MapView({
+      container: "leftDiv",
+      map: overViewMap,
+      center:[119.063717,31.550304],
+      zoom: 9,
+    });
+
+    var threeView = new MapView({
+      container: "bottomLeftDiv",
+      map: fourViewMap,
+      center:[105.063717,31.550304],
+      zoom: 9,
+    });
+
+    var fourView = new MapView({
+      container: "bottomRightDiv",
+      map: fiveViewMap,
+      center:[123.063717,41.550304],
+      zoom: 9,
+    });
+    var fiveView = new MapView({
+      container: "middleDiv",
+      map: middleViewMap,
+      center:[127.063717,41.550304],
+      zoom: 9,
+    });
+    var sixView = new MapView({
+      container: "bottomMiddleDiv",
+      map: sixViewMap,
+      center:[133.063717,41.550304],
+      zoom: 9,
+    });
+
+     //阻止滚动事件
+     mapView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });
+    mainView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });
+    threeView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });
+    fourView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });
+    fiveView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            }); 
+    sixView.on("mouse-wheel", function (event) {
+                event.stopPropagation();
+            });      
+    //地图一实现连动
+    mapView.on("drag",function(event){
+      synchronous(mainView,mapView);
+      synchronous(threeView,mapView);
+      synchronous(fourView,mapView);
+      synchronous(fiveView,mapView);
+      synchronous(sixView,mapView);
+    });
+    mainView.on("drag",function(event){ 
+      synchronous(mapView,mainView);
+      synchronous(threeView,mainView);
+      synchronous(fourView,mainView);
+      synchronous(fiveView,mainView);
+      synchronous(sixView,mainView);
+    }); 
+  
+    threeView.on("drag",function(event){ 
+      synchronous(mapView,threeView);
+      synchronous(mainView,threeView);
+      synchronous(fourView,threeView);
+      synchronous(fiveView,threeView);
+      synchronous(sixView,threeView);
+
+    }); 
+     
+    fourView.on("drag",function(event){ 
+      synchronous(mapView,fourView);
+      synchronous(mainView,fourView);
+      synchronous(threeView,fourView);
+      synchronous(fiveView,fourView);
+      synchronous(sixView,fourView);
+    }); 
+    fiveView.on("drag",function(event){ 
+      synchronous(mapView,fiveView);
+      synchronous(mainView,fiveView);
+      synchronous(threeView,fiveView);
+      synchronous(fourView,fiveView);
+      synchronous(sixView,fiveView);
+    }); 
+  
+    sixView.on("drag",function(event){ 
+      synchronous(mapView,sixView);
+      synchronous(mainView,sixView);
+      synchronous(threeView,sixView);
+      synchronous(fourView,sixView);
+      synchronous(fiveView,sixView);
+    });
+
+    window.onload = function(){
+      var listen1 = document.getElementById('rightDiv').querySelectorAll('.esri-widget--button');
+      listen1[0].addEventListener('click',function(){
+      synchronous2(mapView,mainView);
+      synchronous2(threeView,mainView);
+      synchronous2(fourView,mainView);
+      synchronous2(fiveView,mainView);
+      synchronous2(sixView,mainView);
+      
+      })
+      listen1[1].addEventListener('click',function(){
+      synchronous2(mapView,mainView);
+      synchronous2(threeView,mainView);
+      synchronous2(fourView,mainView);
+      synchronous2(fiveView,mainView);
+      synchronous2(sixView,mainView);
+      })
+      var listen2 = document.getElementById('leftDiv').querySelectorAll('.esri-widget--button');
+      listen2[0].addEventListener('click',function(){
+      synchronous2(sixView,mapView);
+      synchronous2(mainView,mapView);
+      synchronous2(threeView,mapView);
+      synchronous2(fourView,mapView);
+      synchronous2(fiveView,mapView);
+      })
+      listen2[1].addEventListener('click',function(){
+        synchronous2(sixView,mapView);
+      synchronous2(mainView,mapView);
+      synchronous2(threeView,mapView);
+      synchronous2(fourView,mapView);
+      synchronous2(fiveView,mapView);
+     
+      });
+      
+     
+      var listen3 = document.getElementById('bottomLeftDiv').querySelectorAll('.esri-widget--button');
+      listen3[0].addEventListener('click',function(){
+      synchronous2(mapView,threeView);
+      synchronous2(mainView,threeView);
+      synchronous2(fourView,threeView);
+      synchronous2(fiveView,threeView);
+      synchronous2(sixView,threeView);
+      })
+      listen3[1].addEventListener('click',function(){
+      synchronous2(mapView,threeView);
+      synchronous2(mainView,threeView);
+      synchronous2(fourView,threeView);
+      synchronous2(fiveView,threeView);
+      synchronous2(sixView,threeView);
+      })
+      var listen4 = document.getElementById('bottomRightDiv').querySelectorAll('.esri-widget--button');
+      listen4[0].addEventListener('click',function(){
+      synchronous2(mapView,fourView);
+      synchronous2(mainView,fourView);
+      synchronous2(threeView,fourView);
+      synchronous2(fiveView,fourView);
+      synchronous2(sixView,fourView);
+      })
+      listen4[1].addEventListener('click',function(){
+      synchronous2(mapView,fourView);
+      synchronous2(mainView,fourView);
+      synchronous2(threeView,fourView);
+      synchronous2(fiveView,fourView);
+      synchronous2(sixView,fourView);
+      })
+
+      var listen5 = document.getElementById('middleDiv').querySelectorAll('.esri-widget--button');
+      listen5[0].addEventListener('click',function(){
+      synchronous2(mapView,fiveView);
+      synchronous2(mainView,fiveView);
+      synchronous2(threeView,fiveView);
+      synchronous2(fourView,fiveView);
+      synchronous2(sixView,fiveView);
+       
+      })
+      listen5[1].addEventListener('click',function(){
+      synchronous2(mapView,fiveView);
+      synchronous2(mainView,fiveView);
+      synchronous2(threeView,fiveView);
+      synchronous2(fourView,fiveView);
+      synchronous2(sixView,fiveView);
+      })
+      var listen6 = document.getElementById('bottomMiddleDiv').querySelectorAll('.esri-widget--button');
+      listen6[0].addEventListener('click',function(){
+      synchronous2(mapView,sixView);
+      synchronous2(mainView,sixView);
+      synchronous2(threeView,sixView);
+      synchronous2(fourView,sixView);
+      synchronous2(fiveView,sixView);
+       
+      })
+      listen6[1].addEventListener('click',function(){
+      synchronous2(mapView,sixView);
+      synchronous2(mainView,sixView);
+      synchronous2(threeView,sixView);
+      synchronous2(fourView,sixView);
+      synchronous2(fiveView,sixView);
+      })
+    }
+    //封装好的负责连动的方法  
+      function synchronous(map,main){   
+        map.
+        when(function(){
+          watchUtils.whenTrueOnce(main,"stationary", function(){
+              map.goTo({
+              center: main.center
+           })
+      });  
+   });        
+  }
+  function synchronous2(map,main){   
+           map.
+           when(function(){
+             watchUtils.whenTrueOnce(main,"stationary", function(){ 
+                 map.goTo({
+                 center: main.center,
+                 scale:
+                main.scale *
+                0.8*
+                Math.max(
+                  main.width / map.width,
+                  main.height / map.height
+                )
+              })
+         });  
+      });        
+     }
+  });
+   </script>
+</head>
+<body>
+<div class="container">
+    <div class = "navFilter">
+        <select id = "left_select_1" class="left_select">
+            <option value = "layerLeft0">田坎</option>
+            <option value = "layerLeft1">铁路用地</option>
+            <option value = "layerLeft2">微信</option>
+            <option value = "layerLeft3">百度OPI201806</option>
+        </select>
+        <select id = "middle_select_1" class="middle_select">
+            <option value = "layerMiddle0">田坎</option>
+            <option value = "layerMiddle1">铁路用地</option>
+            <option value = "layerMiddle2">微信</option>
+            <option value = "layerMiddle3">百度OPI201806</option>
+        </select>
+        <select id = "right_select_1" class="right_select">
+            <option value = "layerRight0">田坎</option>
+            <option value = "layerRight1">铁路用地</option>
+            <option value = "layerRight2">微信</option>
+            <option value = "layerRight3">百度OPI201806</option>
+        </select>
+    </div>
+    <div class="row">
+        <div id="leftDiv"></div>
+        <div id="rightDiv"></div>
+        <div id="middleDiv"></div>
+    </div>
+    <div class = "navFilter">
+        <select id = "left_select_2" class="left_select">
+            <option value = "layerBL0">田坎</option>
+            <option value = "layerBL1">铁路用地</option>
+            <option value = "layerBL2">微信</option>
+            <option value = "layerBL3">百度OPI201806</option>
+        </select>
+        <select id = "middle_select_2" class="middle_select">
+            <option value = "layerBM0">田坎</option>
+            <option value = "layerBM1">铁路用地</option>
+            <option value = "layerBM2">微信</option>
+            <option value = "layerBM3">百度OPI201806</option>
+        </select>
+        <select id = "right_select_2" class="right_select">
+            <option value = "layerBR0">田坎</option>
+            <option value = "layerBR1">铁路用地</option>
+            <option value = "layerBR2">微信</option>
+            <option value = "layerBR3">百度OPI201806</option>
+        </select>
+    </div>
+    <div class="row">
+        <div id="bottomLeftDiv"></div>
+        <div id="bottomRightDiv"></div>
+        <div id="bottomMiddleDiv"></div>
+    </div>
+</div>
+</body>
+</html>

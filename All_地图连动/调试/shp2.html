@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+</body>
+</html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>动态图层添加shp文件</title>
+    <link rel="stylesheet" href="http://localhost/arcgis_js_v35_sdk/arcgis_js_api/library/3.5/3.5/js/esri/css/esri.css"/>
+     <script src="http://localhost/arcgis_js_v35_sdk/arcgis_js_api/library/3.5/3.5/init.js" type="text/javascript"></script>
+     <script src="http://localhost/arcgis_js_v35_sdk/arcgis_js_api/library/3.5/3.5" type="text/javascript"></script>
+     <script src="dojo/jsapi_vsdoc12_v35.js" type="text/javascript"></script>
+    <style type="text/css">
+      .MapClass
+      {
+        width:900px;
+        height:600px;
+        border:1px solid #000;    
+      }
+    </style>
+
+    <script type="text/javascript">
+        var map;
+        dojo.require("esri.map");
+        dojo.require("esri.layers.FeatureLayer");
+        dojo.addOnLoad(function () {
+                map = new esri.Map("MyMapDiv");
+                var DynamicLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/全国县市_DynamicLayer/MapServer");
+                map.addLayer(DynamicLayer);
+            });
+
+function AddDynamicLayer()
+ {
+            var TableSource = new esri.layers.TableDataSource();
+            TableSource.workspaceId = "MyShapefileWorkspaceID";
+            TableSource.dataSourceName = "roa_4m.shp";
+            var layerSource = new esri.layers.LayerDataSource();
+            layerSource.dataSource = TableSource;
+            var featurelayer = new esri.layers.FeatureLayer(
+                         "http://localhost:6080/arcgis/rest/services/全国县市_DynamicLayer/MapServer/dynamicLayer", //注意调用动态图层的时候在原服务的链接后面加上dynamicLayer
+                         {
+                              mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
+                              outFields: ["*"],
+                              source:layerSource
+                         });
+            var symbol = esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([255, 0, 0]), 3);
+            var renderer = new esri.renderer.SimpleRenderer(symbol);
+            featurelayer.setRenderer(renderer);
+            featurelayer.refresh();
+            map.addLayer(featurelayer);
+  }
+
+</script>
+</head>
+<body class="tundra">
+  <div id="MyMapDiv" class="MapClass">
+  <div id="DrawDiv" style="width:100px; height:50px">
+     <button id="point" onclick="AddDynamicLayer()">添加shp</button>
+  </div>
+  </div>
+</body>
+</html>

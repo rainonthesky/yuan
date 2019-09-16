@@ -1,0 +1,118 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta
+            name="viewport"
+            content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Overview map - 4.11</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            width: 940px;
+            height: 800px;
+            z-index: -1;
+        }
+
+        #overviewDiv {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 500px;
+            height: 600px;
+            border: 1px solid black;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        #extentDiv {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            z-index: 2;
+        }
+    </style>
+
+    <link
+            rel="stylesheet"
+            href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/"></script>
+
+    <script>
+        require([
+        "esri/Map",
+       "esri/views/SceneView",
+       "esri/views/MapView",
+       "esri/geometry/Point",
+       "esri/core/watchUtils",
+       "esri/layers/FeatureLayer",
+       "esri/layers/TileLayer"
+        ], function (Map, MapView, MapView, Point, watchUtils,FeatureLayer,TileLayer) {
+
+      var layer1= new FeatureLayer({
+         	url: "https://192.168.80.172:6443/arcgis/rest/services/cztest2/CZCZ/MapServer/0",	
+          });
+      var layer2= new TileLayer({
+         	url: "https://192.168.80.172:6443/arcgis/rest/services/cztest2/CZTest2Ditu/MapServer",	
+          });
+            
+            var mainMap = new Map({
+                   layers: [layer2]
+                 });
+                 mainMap.add(layer1)
+            
+            var mainView = new MapView({
+                container: "viewDiv",
+                center:[140.563717,36.550304],
+                 map: mainMap,
+                 zoom: 12
+            }); 
+             
+
+            // window.onload =function(){
+            //     console.log("1111")
+               
+                // mainView.ready=function(){
+                // mainView.center.x=561286.4535113048,
+                // mainView.center.y=3516183.977640471
+                // }
+                // mainView.ready=function(){
+            //     console.log("21212");
+            //     center:[140.563717,31.550304]
+            //     }
+                
+            // mainView.goTo({
+            //      center: mainView.center
+            //   })
+              
+            // }
+
+
+        //     $(document).ready()=function(){
+        //     //中心点的位置，不是坐标
+        //     mainView.center.x=501286.4535113048,
+        //     mainView.center.y=3516183.977640471,
+        //     mainView.goTo({
+        //          center: mainView.center
+        //       })
+                
+        // }    
+     
+         
+    
+         
+
+        });
+    </script>
+</head>
+
+<body>
+<div id="viewDiv">
+
+</div>
+</div>
+</body>
+</html>
